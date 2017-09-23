@@ -30,29 +30,24 @@ def append_pdf(input,output):
 list_files = os.listdir(path)
 # Creating an object where pdf pages are appended to
 output = PdfFileWriter()
-
+list_files.sort()
 # Appending two pdf-pages from two different files
 for file in list_files:
 	file = "ToMerge/" + file
-	if file.split('.')[-1] == 'gitignore':
-		continue
-	if file[-3:] != 'pdf':
+	if file[-3:] != 'pdf' and file[-10:] !='.gitignore':
 		command = "unoconv -f pdf " + str(file.replace(" ", "\ "))
 		try:
+			command  += "; mv " + str(file.replace(" ", "\ ")) + " Consumed/"
 			subprocess.call(command, shell=True)
 		except:
 			print "Error while converting ", file, " to PDF"
 
-	if file[-3:] == 'pdf' and file[-10:] != '.gitignore' :
+	if file[-3:] == 'pdf' :
 		with open(file, 'rb') as input_file:
-		input_buffer = StringIO(input_file.read())
+			input_buffer = StringIO(input_file.read())
 		try:
 			print "   appending file...  :", file
 			append_pdf(PdfFileReader(input_buffer),output)
-			move_command = "mv " + str(file) + " /Consumed"
-			print move_command
-			subprocess.call(move_command, shell=True)
-			#shutil.move(file, "Consumed/")
 		except utils.PdfReadError:
 			#append_pdf(PdfFileReader(decompress_pdf(input_buffer)),output)
 			print " [Error merging file] :", file , "skiping... " 
